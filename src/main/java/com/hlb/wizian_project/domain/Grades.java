@@ -2,7 +2,6 @@ package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "grades")
@@ -17,11 +16,13 @@ public class Grades {
     @Column(name = "grades_no", nullable = false)
     private Integer gradesNo;
 
-    @Column(name = "apply_no", nullable = false)
-    private Integer applyNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "apply_no", nullable = false)
+    private LectApply apply;
 
-    @Column(name = "stdnt_no", nullable = false)
-    private Integer stdntNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stdnt_no", nullable = false)
+    private Studnt studnt;
 
     @Column(name = "attend_point")
     private Integer attendPoint;

@@ -17,11 +17,13 @@ public class AssignSubmit {
     @Column(name = "assign_no", nullable = false)
     private Integer assignNo;
 
-    @Column(name = "assign_info_no", nullable = false)
-    private Integer assignInfoNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assign_info_no", nullable = false)
+    private AssignInfo assignInfo;
 
-    @Column(name = "lect_no", nullable = false)
-    private Integer lectNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lect_no", nullable = false)
+    private LectInfo lectInfo;
 
     @Column(name = "assign_point", nullable = false)
     private Integer assignPoint;
@@ -32,9 +34,11 @@ public class AssignSubmit {
     @Column(name = "assign_duedate")
     private LocalDateTime assignDuedate;
 
-    @Column(name = "apply_no", nullable = false)
-    private Integer applyNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "apply_no", nullable = false)
+    private LectApply apply;
 
-    @Column(name = "stdnt_no", nullable = false)
-    private Integer stdntNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stdnt_no", nullable = false)
+    private Studnt studnt;
 }

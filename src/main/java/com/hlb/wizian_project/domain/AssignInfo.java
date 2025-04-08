@@ -1,6 +1,8 @@
 package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 import lombok.*;
 import java.time.LocalDateTime;
 
