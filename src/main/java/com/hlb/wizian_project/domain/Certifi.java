@@ -14,18 +14,20 @@ public class Certifi {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "csert_no", nullable = false)
-    private Integer csertNo;
+    @Column(nullable = false)
+    private int certifiNo;
 
-    @Column(name = "cert_date", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "apply_no", nullable = false)
+    private LectApply lectApply;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stdnt_no", nullable = false)
+    private Studnt studnt;
+
+    @Column(nullable = false)
     private LocalDateTime certDate;
 
-    @Column(name = "cert_file", length = 2000, nullable = false)
+    @Column(length = 255, nullable = false)
     private String certFile;
-
-    @Column(name = "apply_no", nullable = false)
-    private Integer applyNo;
-
-    @Column(name = "stdnt_no", nullable = false)
-    private Integer stdntNo;
 }

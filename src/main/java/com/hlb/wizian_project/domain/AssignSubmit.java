@@ -14,8 +14,8 @@ public class AssignSubmit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "assign_no", nullable = false)
-    private Integer assignNo;
+    @Column(nullable = false)
+    private int assignNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assign_info_no", nullable = false)
@@ -25,20 +25,20 @@ public class AssignSubmit {
     @JoinColumn(name = "lect_no", nullable = false)
     private LectInfo lectInfo;
 
-    @Column(name = "assign_point", nullable = false)
-    private Integer assignPoint;
-
-    @Column(name = "assign_ans", length = 2000)
-    private String assignAns;
-
-    @Column(name = "assign_duedate")
-    private LocalDateTime assignDuedate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "apply_no", nullable = false)
-    private LectApply apply;
+    private LectApply lectApply;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stdnt_no", nullable = false)
     private Studnt studnt;
+
+    @Column(nullable = false)
+    private int assignPoint;
+
+    @Column(length = 2000)
+    private String assignAns;
+
+    @Column(nullable = false)
+    private LocalDateTime assignDuedate;
 }

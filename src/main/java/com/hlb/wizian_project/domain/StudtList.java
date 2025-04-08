@@ -14,18 +14,20 @@ public class StudtList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "list_no", nullable = false)
-    private Integer listNo;
+    @Column(nullable = false)
+    private int attendNo;
 
-    @Column(name = "lect_no", nullable = false)
-    private Integer lectNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lect_no", nullable = false)
+    private LectInfo lectInfo;
 
-    @Column(name = "stdnt_no", nullable = false)
-    private Integer stdntNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stdnt_no", nullable = false)
+    private Studnt studnt;
 
-    @Column(name = "attend_date", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime attendDate;
 
-    @Column(name = "attend_status", nullable = false)
-    private Integer attendStatus;
+    @Column(nullable = false)
+    private int attendStatus;
 }

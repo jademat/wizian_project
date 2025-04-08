@@ -14,21 +14,23 @@ public class LectApply {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "apply_no", nullable = false)
-    private Integer applyNo;
+    @Column(nullable = false)
+    private int applyNo;
 
-    @Column(name = "stdnt_no", nullable = false)
-    private Integer stdntNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stdnt_no", nullable = false)
+    private Studnt studnt;
 
-    @Column(name = "apply_status", length = 50)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lect_no", nullable = false)
+    private LectInfo lectInfo;
+
+    @Column(length = 50)
     private String applyStatus;
 
-    @Column(name = "apply_date")
+    @Column
     private LocalDateTime applyDate;
 
-    @Column(name = "apply_endate")
+    @Column
     private LocalDateTime applyEndate;
-
-    @Column(name = "lect_no", nullable = false)
-    private Integer lectNo;
 }
