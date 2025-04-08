@@ -14,21 +14,22 @@ public class Refund {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "refund_no", nullable = false)
-    private Integer refundNo;
+    @Column(nullable = false)
+    private int refundNo;
 
-    @Column(name = "refund_date")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pay_no", nullable = false)
+    private Payment payment;
+
+    @Column(nullable = false)
     private LocalDateTime refundDate;
 
-    @Column(name = "refund_amt")
-    private Integer refundAmt;
+    @Column(nullable = false)
+    private int refundAmt;
 
-    @Column(name = "refund_state", length = 8)
+    @Column(length = 10, nullable = false)
     private String refundState;
 
-    @Column(name = "refund_reason", length = 8)
+    @Column(length = 100)
     private String refundReason;
-
-    @Column(name = "pay_no", nullable = false)
-    private Integer payNo;
 }

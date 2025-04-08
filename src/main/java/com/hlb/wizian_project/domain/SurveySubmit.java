@@ -13,15 +13,17 @@ public class SurveySubmit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "survey_submit_nm", nullable = false)
-    private Integer surveySubmitNm;
+    @Column(nullable = false)
+    private int surveySubmitNo;
 
-    @Column(name = "stdnt_no", nullable = false)
-    private Integer stdntNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stdnt_no", nullable = false)
+    private Studnt studnt;
 
-    @Column(name = "survey_no", nullable = false)
-    private Integer surveyNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "survey_no", nullable = false)
+    private Survey survey;
 
-    @Column(name = "survey_point", nullable = false)
-    private Integer surveyPoint;
+    @Column(nullable = false)
+    private int surveyPoint;
 }

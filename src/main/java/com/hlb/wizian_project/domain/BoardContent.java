@@ -14,33 +14,34 @@ public class BoardContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_content_no", nullable = false)
-    private Integer boardContentNo;
+    @Column(nullable = false)
+    private int boardContentNo;
 
-    @Column(name = "board_no", nullable = false)
-    private Integer boardNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_no", nullable = false)
+    private BoardInfo boardInfo;
 
-    @Column(name = "board_title", length = 1000, nullable = false)
+    @Column(length = 100, nullable = false)
     private String boardTitle;
 
-    @Column(name = "board_cont", length = 2000, nullable = false)
+    @Column(length = 2000, nullable = false)
     private String boardCont;
 
-    @Column(name = "file_no", nullable = false)
-    private Integer fileNo;
+    @Column(nullable = false)
+    private int fileNo;
 
-    @Column(name = "board_writer", length = 50, nullable = false)
+    @Column(length = 50, nullable = false)
     private String boardWriter;
 
-    @Column(name = "board_views", nullable = false)
-    private Integer boardViews;
+    @Column(nullable = false)
+    private int boardViews;
 
-    @Column(name = "board_secu", nullable = false)
-    private Integer boardSecu;
+    @Column(nullable = false)
+    private int boardSecu;
 
-    @Column(name = "board_date", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime boardDate;
 
-    @Column(name = "board_content_no_pre", nullable = false)
-    private Integer boardContentNoPre;
+    @Column(nullable = false)
+    private int boardContentNoPre;
 }

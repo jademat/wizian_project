@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins= {"http://172.30.1.11:3000"})
+@CrossOrigin(origins= {"http://localhost:3000"})
 @Slf4j
 @RestController
 @RequestMapping("/api/inst/class")
@@ -20,8 +20,8 @@ public class ClassController {
 
     @GetMapping("/list/{cpg}")
     public ResponseEntity<?> list(@PathVariable int cpg) {
-        CourseInstListDTO boardListDTO = classService.readClass(cpg);
+        CourseInstListDTO classListDTO = classService.readClass(cpg);
 
-        return new ResponseEntity<>(boardListDTO, HttpStatus.OK);
+        return new ResponseEntity<>(classListDTO, HttpStatus.OK);
     }
 }

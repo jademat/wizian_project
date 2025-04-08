@@ -13,32 +13,32 @@ public class Grades {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "grades_no", nullable = false)
-    private Integer gradesNo;
+    @Column(nullable = false)
+    private int gradesNo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "apply_no", nullable = false)
-    private LectApply apply;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "apply_no", nullable = false, unique = true)
+    private LectApply lectApply;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stdnt_no", nullable = false)
     private Studnt studnt;
 
-    @Column(name = "attend_point")
-    private Integer attendPoint;
+    @Column
+    private int attendPoint;
 
-    @Column(name = "attend_onepoint")
-    private Integer attendOnepoint;
+    @Column
+    private int attendOnepoint;
 
-    @Column(name = "assign_twopoint")
-    private Integer assignTwopoint;
+    @Column
+    private int assignTwopoint;
 
-    @Column(name = "grades_point")
-    private Integer gradesPoint;
+    @Column
+    private int gradesPoint;
 
-    @Column(name = "grades_duedate", length = 8)
+    @Column(length = 8)
     private String gradesDuedate;
 
-    @Column(name = "grades_option")
-    private Integer gradesOption;
+    @Column
+    private int gradesOption;
 }

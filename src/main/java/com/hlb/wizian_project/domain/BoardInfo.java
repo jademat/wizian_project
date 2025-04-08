@@ -13,15 +13,16 @@ public class BoardInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "baord_no", nullable = false)
-    private Integer baordNo;
+    @Column(nullable = false)
+    private int boardNo;
 
-    @Column(name = "board_cate", length = 50, nullable = false)
+    @Column(length = 50, nullable = false)
     private String boardCate;
 
-    @Column(name = "board_type", length = 10, nullable = false)
+    @Column(length = 10, nullable = false)
     private String boardType;
 
-    @Column(name = "lect_no", nullable = false)
-    private Integer lectNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lect_no")
+    private LectInfo lectInfo;
 }
