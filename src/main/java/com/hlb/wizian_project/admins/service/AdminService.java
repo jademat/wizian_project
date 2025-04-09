@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface AdminService {
     Page<Admin> getAdmins(String search, Pageable pageable);
     Optional<Admin> getAdminById(int adminNo);
+
+    Admin newAdmin(Admin admin);
 }

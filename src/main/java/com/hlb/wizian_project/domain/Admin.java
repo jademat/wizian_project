@@ -1,6 +1,8 @@
 package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -51,4 +53,8 @@ public class Admin {
 
     @CreationTimestamp
     private LocalDateTime addrDate;
+
+    @Transient
+    @JsonProperty("g-recaptcha-response")
+    private String gRecaptchaResponse;
 }
