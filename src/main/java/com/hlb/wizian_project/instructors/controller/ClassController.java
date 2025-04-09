@@ -18,9 +18,10 @@ public class ClassController {
     private final ClassService classService;
 
 
-    @GetMapping("/list/{cpg}")
-    public ResponseEntity<?> list(@PathVariable int cpg) {
-        CourseInstListDTO classListDTO = classService.readClass(cpg);
+    @GetMapping("/list/{sortYear}/{sortWeek}/{findkey}/{cpg}")
+    public ResponseEntity<?> list(@PathVariable int cpg, @PathVariable String sortYear,
+                                  @PathVariable String sortWeek, @PathVariable String findkey) {
+        CourseInstListDTO classListDTO = classService.findClass(cpg, sortYear, sortWeek, findkey);
 
         return new ResponseEntity<>(classListDTO, HttpStatus.OK);
     }
