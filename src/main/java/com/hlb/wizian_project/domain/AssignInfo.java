@@ -34,6 +34,9 @@ public class AssignInfo {
     @Column(length = 50, nullable = false)
     private String assignInfoMonth;
 
+    @Column(length = 50, nullable = false)
+    private String instNm;
+
     @Column(nullable = false)
     private LocalDateTime assignDate;
 
