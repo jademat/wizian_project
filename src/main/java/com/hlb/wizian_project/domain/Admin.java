@@ -2,6 +2,9 @@ package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "admin")
@@ -44,5 +47,8 @@ public class Admin {
     private String addrDtl;
 
     @Column
-    private java.time.LocalDateTime addrDate;
+    private String role;
+
+    @CreationTimestamp
+    private LocalDateTime addrDate;
 }
