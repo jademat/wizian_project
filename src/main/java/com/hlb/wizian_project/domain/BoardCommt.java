@@ -2,6 +2,8 @@ package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,7 +32,7 @@ public class BoardCommt {
     @Column(nullable = false)
     private int fileNo;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime boardCommtDate;
 
     @Column(nullable = false)
