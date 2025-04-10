@@ -5,8 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ClassRepository extends JpaRepository<Courses, Long> {
+public interface CourseRepository extends JpaRepository<Courses, Long> {
 
+    // findAllCourse
     Page<Courses> findBy(Pageable pageable);
 
     Page<Courses> findByCourYearAndCourWeek(Pageable pageable, String sortYear, String sortWeek);
