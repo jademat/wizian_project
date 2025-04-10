@@ -2,6 +2,7 @@ package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "inst")
@@ -43,6 +44,6 @@ public class Inst {
     @Column(length = 50)
     private String email;
 
-    @Column
+    @CreationTimestamp
     private java.time.LocalDateTime instDate;
 }

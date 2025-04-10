@@ -2,6 +2,8 @@ package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,7 +26,7 @@ public class Notice {
     @Column(length = 1000, nullable = false)
     private String noticeCont;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime noticeDate;
 
     @Column(nullable = false)

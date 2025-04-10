@@ -1,7 +1,12 @@
 package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "admin")
@@ -44,5 +49,12 @@ public class Admin {
     private String addrDtl;
 
     @Column
-    private java.time.LocalDateTime addrDate;
+    private String role;
+
+    @CreationTimestamp
+    private LocalDateTime addrDate;
+
+    @Transient
+    @JsonProperty("g-recaptcha-response")
+    private String gRecaptchaResponse;
 }

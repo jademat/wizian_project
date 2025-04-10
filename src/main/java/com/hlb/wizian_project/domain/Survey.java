@@ -1,12 +1,15 @@
 package com.hlb.wizian_project.domain;
 
-import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "survey")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,7 +26,7 @@ public class Survey {
     @Column(length = 10, nullable = false)
     private String surveyQnum;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime surveyDate;
 
     @Column(length = 10, nullable = false)
