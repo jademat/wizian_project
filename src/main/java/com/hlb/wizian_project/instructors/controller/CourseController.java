@@ -1,13 +1,19 @@
 package com.hlb.wizian_project.instructors.controller;
 
 import com.hlb.wizian_project.domain.CourseInstListDTO;
+import com.hlb.wizian_project.domain.CourseStdntInstListDTO;
 import com.hlb.wizian_project.domain.LectInfoInstListDTO;
-import com.hlb.wizian_project.instructors.service.ClassService;
+import com.hlb.wizian_project.instructors.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @CrossOrigin(origins= {"http://localhost:3000"})
 @Slf4j
@@ -16,23 +22,17 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CourseController {
 
-    private final ClassService classService;
+    private final CourseService courseService;
 
 
-    @GetMapping("/allCourse/list/{sortYear}/{sortWeek}/{findkey}/{cpg}")
-    public ResponseEntity<?> allCourseList(@PathVariable int cpg, @PathVariable String sortYear,
-                                  @PathVariable String sortWeek, @PathVariable String findkey) {
-        CourseInstListDTO classListDTO = classService.findAllCourse(cpg, sortYear, sortWeek, findkey);
+    @GetMapping("/courseInfo/list/{cpg}")
+    public ResponseEntity<?> allCourseList(Authentication authentication, @PathVariable int cpg) {
+        // 로그인 된 강사 정보 추출
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String loginInst = userDetails.getUsername();
 
-        return new ResponseEntity<>(classListDTO, HttpStatus.OK);
-    }
+        CourseStdntInstListDTO courseInfoDTO = courseService.findOneLectListStdnt(cpg, loginInst);
 
-
-    @GetMapping("/allClass/list/{sortLoc}/{sortStatus}/{sortInstNm}/{findkey}/{cpg}")
-    public ResponseEntity<?> allclassList(@PathVariable int cpg, @PathVariable String sortLoc,
-                                  @PathVariable String sortStatus, @PathVariable String sortInstNm, @PathVariable String findkey) {
-        LectInfoInstListDTO classListDTO = classService.findAllClass(cpg, sortLoc, sortStatus, sortInstNm, findkey);
-
-        return new ResponseEntity<>(classListDTO, HttpStatus.OK);
+        return new ResponseEntity<>(courseInfoDTO, HttpStatus.OK);
     }
 }

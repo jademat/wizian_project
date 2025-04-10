@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface LectInfoRepository extends JpaRepository<LectInfo, Long> {
 
     // findAllClass
@@ -15,4 +17,7 @@ public interface LectInfoRepository extends JpaRepository<LectInfo, Long> {
     Page<LectInfo> findByLectStatus(Pageable pageable, String sortStatus);
     Page<LectInfo> findByInstNm(Pageable pageable, String sortInstNm);
     Page<LectInfo> findByLectNmContains(Pageable pageable, String findkey);
+
+    // findOneLectListStdnt
+    LectInfo findByInstNm(String loginInst);
 }

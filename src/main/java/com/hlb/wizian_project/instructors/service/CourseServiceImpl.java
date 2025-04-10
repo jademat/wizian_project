@@ -1,11 +1,10 @@
 package com.hlb.wizian_project.instructors.service;
 
-import com.hlb.wizian_project.domain.CourseInstListDTO;
-import com.hlb.wizian_project.domain.Courses;
-import com.hlb.wizian_project.domain.LectInfo;
-import com.hlb.wizian_project.domain.LectInfoInstListDTO;
+import com.hlb.wizian_project.domain.*;
 import com.hlb.wizian_project.instructors.repository.CourseRepository;
 import com.hlb.wizian_project.instructors.repository.LectInfoRepository;
+import com.hlb.wizian_project.instructors.repository.StudntRepository;
+import com.hlb.wizian_project.students.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -15,65 +14,29 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class CourseServiceImpl implements ClassService {
+public class CourseServiceImpl implements CourseService {
 
-    private final CourseRepository courseMapper;
     private final LectInfoRepository lectInfoMapper;
+    private final StudntRepository studentMapper;
     @Value("${inst.pagesize}")
     private int pageSize;
 
 
     @Override
-    public CourseInstListDTO findAllCourse(int cpg, String sortYear, String sortWeek, String findkey) {
-        Pageable pageable = PageRequest.of(cpg - 1, pageSize, Sort.Direction.DESC, "courNo");
-        Page<Courses> pageclasses = null;
+    public CourseStdntInstListDTO findOneLectListStdnt(int cpg, String loginInst) {
+        // 강사가 진행하는 수업정보 출력
+        LectInfo oneLectData = lectInfoMapper.findByInstNm(loginInst);
+        // 강사가 진행하는 강의 번호 출력
+        int lectNo = oneLectData.getLectNo();
+        // 강사가 진행하는 수업을 듣는 학생리스트 출력
+        List<Studnt> students = studentMapper.findLectStudentList(lectNo);
+        // 학생리스트 카운트
+        int totalItems = students.size();
 
-        if (!sortYear.equals("default") && !sortWeek.equals("default")) {
-            pageclasses = courseMapper.findByCourYearAndCourWeek(pageable, sortYear, sortWeek);
-        } else if (!sortYear.equals("default") && sortWeek.equals("default")) {
-            pageclasses = courseMapper.findByCourYear(pageable, sortYear);
-        } else if (sortYear.equals("default") && !sortWeek.equals("default")) {
-            pageclasses = courseMapper.findByCourWeek(pageable, sortWeek);
-        }else {
-            pageclasses = courseMapper.findBy(pageable);
-        }
-        if (!findkey.equals("all")) {
-            pageclasses = courseMapper.findByCourNmContains(pageable, findkey);
-        }
-
-        List<Courses> classes = pageclasses.getContent();
-        int totalItems = (int) pageclasses.getTotalElements();
-
-        return new CourseInstListDTO(cpg, totalItems, pageSize, classes);
-    }
-
-
-    @Override
-    public LectInfoInstListDTO findAllClass(int cpg, String sortLoc, String sortStatus, String sortInstNm, String findkey) {
-        Pageable pageable = PageRequest.of(cpg - 1, pageSize, Sort.Direction.DESC, "lectNo");
-        Page<LectInfo> pageclasses = null;
-
-        if (!sortLoc.equals("default") && !sortStatus.equals("default") && !sortInstNm.equals("default")) {
-            pageclasses = lectInfoMapper.findByLectLocAndLectStatusAndInstNm(pageable, sortLoc, sortStatus, sortInstNm);
-        } else if (!sortLoc.equals("default") && sortStatus.equals("default") && sortInstNm.equals("default")) {
-            pageclasses = lectInfoMapper.findByLectLoc(pageable, sortLoc);
-        } else if (sortLoc.equals("default") && !sortStatus.equals("default") && sortInstNm.equals("default")) {
-            pageclasses = lectInfoMapper.findByLectStatus(pageable, sortStatus);
-        } else if (sortLoc.equals("default") && sortStatus.equals("default") && !sortInstNm.equals("default")) {
-            pageclasses = lectInfoMapper.findByInstNm(pageable, sortInstNm);
-        } else {
-            pageclasses = lectInfoMapper.findBy(pageable);
-        }
-        if (!findkey.equals("all")) {
-            pageclasses = lectInfoMapper.findByLectNmContains(pageable, findkey);
-        }
-
-        List<LectInfo> classes = pageclasses.getContent();
-        int totalItems = (int) pageclasses.getTotalElements();
-
-        return new LectInfoInstListDTO(cpg, totalItems, pageSize, classes);
+        return new CourseStdntInstListDTO(cpg, totalItems, pageSize, students, oneLectData);
     }
 }
