@@ -19,5 +19,5 @@ public interface LectInfoRepository extends JpaRepository<LectInfo, Long> {
     Page<LectInfo> findByLectNmContains(Pageable pageable, String findkey);
 
     // findOneLectListStdnt
-    LectInfo findByInstNm(String loginInst);
+    LectInfo findByInstNmAndLectStatus(String loginInst, String lectStatus);
 }
