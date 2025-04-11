@@ -27,20 +27,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain fc) throws ServletException, IOException {
-
         String jwt = null;
         String username = null;
 
+        // Authorization 헤더에서 Bearer 토큰 추출
         final String authHeader = req.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
+            jwt = authHeader.substring(7); // "Bearer " 이후의 토큰
         }
 
+        // 쿠키에서 JWT 토큰 추출
         if (jwt == null) {
             Cookie[] cookies = req.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
-                    if (cookie.getName().equals("jwt")) {
+                    if ("jwt".equals(cookie.getName())) {
                         jwt = cookie.getValue();
                         break;
                     }
@@ -48,26 +49,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        // JWT 토큰이 있으면 username 추출
         if (jwt != null) {
             username = jwtTokenProvider.extractUsername(jwt);
         }
         log.info(">> get username : {}", username);
 
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        log.info("JWT: {}", jwt);
+        log.info("Username extracted from JWT: {}", username);
 
+        // username이 존재하고, 인증 정보가 없다면
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             log.info(">> JwtAuthenticationFilter - loadUserByUsername 호출 ");
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            log.info("UserDetails: {}", userDetails);
 
-            if(jwtTokenProvider.validateToken(jwt,userDetails.getUsername())){
+            if (jwtTokenProvider.validateToken(jwt)) { // username 비교 없이 validateToken으로 변경
+                log.info("권한 목록: {}", userDetails.getAuthorities());
 
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                log.info("Authentication set for user: {}", username);
+            } else {
+                log.warn("토큰이 유효하지 않습니다.");
             }
         }
-        fc.doFilter(req, res);
+
+        // 인증 정보가 없다면 요청을 계속 진행
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            log.info(">> 인증이 없음. 요청을 계속 진행합니다.");
+        }
+
+        fc.doFilter(req, res);  // 필터 체인 계속 진행
     }
 }
