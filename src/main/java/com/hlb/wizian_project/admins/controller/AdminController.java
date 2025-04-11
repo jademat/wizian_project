@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,14 +37,14 @@ public class AdminController {
     @GetMapping("/list")
     public Page<Admin> getAdmins(
             @RequestParam(required = false) String search,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "adminNo", direction = Sort.Direction.DESC) Pageable pageable) {
 
         return adminService.getAdmins(search, pageable);
     }
 
     @GetMapping("/detail/{adminNo}")
-    public ResponseEntity<Admin> getAdmin(@PathVariable int adminNo) {
-        Optional<Admin> admin = adminService.getAdminById(adminNo);
+    public ResponseEntity<?> getAdmin(@PathVariable int adminNo) {
+        Optional<?> admin = adminService.getAdminById(adminNo);
         return admin.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -87,5 +89,21 @@ public class AdminController {
 
        return response;
    }
+
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+        if (refreshToken != null && refreshToken.startsWith("Bearer ")) {
+            refreshToken = refreshToken.substring(7); // 'Bearer ' 부분 제거
+        }
+
+        if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
+            String newAccessToken = jwtTokenProvider.generateTokenFromRefresh(refreshToken);
+            // JSON 응답을 반환해야 합니다.
+            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));  // 수정된 부분
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid refresh token");
+    }
 
 }

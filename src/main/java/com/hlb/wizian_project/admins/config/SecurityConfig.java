@@ -4,6 +4,7 @@ import com.hlb.wizian_project.admins.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,6 +34,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/admins/admin/login").permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/admins/**").authenticated()
                 .antMatchers("/api/admins/**").authenticated()
                 .anyRequest().permitAll()
                 .and()

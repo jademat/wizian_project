@@ -1,6 +1,7 @@
 package com.hlb.wizian_project.admins.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -21,24 +22,30 @@ public class JwtTokenProvider {
 
     private Key secretKey;
 
-
     @PostConstruct
     protected void init() {
         byte[] keyBytes = secretString.getBytes();
         secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username) {
+    private String generateToken(String username, long expirationTime) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + validity);
+        Date expiration = new Date(now.getTime() + expirationTime); // expirationTime 인자를 사용
 
-        return Jwts.builder().setSubject(username).setIssuedAt(now).setExpiration(expiration).signWith(SignatureAlgorithm.HS256, secretKey).compact();
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiration)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 
-    public boolean validateToken(String token, String username) {
-        final String tokenUsername = extractUsername(token);
+    public String generateToken(String username) {
+        return generateToken(username, validity); // 기본 validtiy 사용
+    }
 
-        return (tokenUsername.equals(username) && !isTokenExpired(token));
+    public boolean validateToken(String token) {
+        return !isTokenExpired(token); // username 비교가 필요 없으므로, 단순히 만료 여부만 확인
     }
 
     public String extractUsername(String token) {
@@ -53,4 +60,14 @@ public class JwtTokenProvider {
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
     }
 
+    public String generateTokenFromRefresh(String refreshToken) {
+        // 예시: Refresh token에서 정보를 추출하고, 새로운 액세스 토큰을 생성
+        Claims claims = extractClaims(refreshToken);
+        String username = claims.getSubject();
+        return generateToken(username, 3600000); // 액세스 토큰의 만료 시간을 1시간으로 설정
+    }
+
+    public String generateAccessToken(String username) {
+        return generateToken(username, 3600000); // 1시간 만료 시간
+    }
 }
