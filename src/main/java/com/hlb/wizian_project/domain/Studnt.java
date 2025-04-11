@@ -1,7 +1,11 @@
 package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,6 +30,13 @@ public class Studnt {
     @Column(length = 50, nullable = false)
     private String stdntEmail;
 
+    @Column
+    private String enable = "false";
+
+    @Column(name = "verifycode")
+    private String verifycode;
+    // 이메일 인증 + 비밀번호 재설정 인증에 사용
+
     @Column(length = 50, nullable = false)
     private String stdntNm;
 
@@ -44,6 +55,21 @@ public class Studnt {
     @Column(length = 200)
     private String addrDtl;
 
-    @Column(nullable = false)
+    @Column
+    @CreationTimestamp
     private LocalDateTime stdntRegdate;
+
+
+    @Column
+    private String role = "STUDENT";
+
+    @Transient
+    @JsonProperty("gRecaptchaResponse")
+    private String gRecaptchaResponse;
+
+    @Column
+    private String resetToken;
+
+    @Column
+    private LocalDateTime tokenExpiry;
 }
