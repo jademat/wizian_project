@@ -1,12 +1,15 @@
 package com.hlb.wizian_project.domain;
 
-import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "board_content")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -39,7 +42,7 @@ public class BoardContent {
     @Column(nullable = false)
     private int boardSecu;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime boardDate;
 
     @Column(nullable = false)

@@ -1,7 +1,10 @@
 package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "inst")
@@ -9,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Inst {
 
     @Id
@@ -43,6 +47,6 @@ public class Inst {
     @Column(length = 50)
     private String email;
 
-    @Column
+    @CreationTimestamp
     private java.time.LocalDateTime instDate;
 }

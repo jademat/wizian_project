@@ -3,8 +3,10 @@ package com.hlb.wizian_project.domain;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+
 
 import java.time.LocalDateTime;
 
@@ -35,7 +37,6 @@ public class Studnt {
 
     @Column(name = "verifycode")
     private String verifycode;
-    // 이메일 인증 + 비밀번호 재설정 인증에 사용
 
     @Column(length = 50, nullable = false)
     private String stdntNm;
@@ -58,7 +59,6 @@ public class Studnt {
     @Column
     @CreationTimestamp
     private LocalDateTime stdntRegdate;
-
 
     @Column
     private String role = "STUDENT";

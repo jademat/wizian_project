@@ -2,6 +2,8 @@ package com.hlb.wizian_project.domain;
 
 import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,7 +36,10 @@ public class AssignInfo {
     @Column(length = 50, nullable = false)
     private String assignInfoMonth;
 
-    @Column(nullable = false)
+    @Column(length = 50, nullable = false)
+    private String instNm;
+
+    @CreationTimestamp
     private LocalDateTime assignDate;
 
     @Column(nullable = false)
