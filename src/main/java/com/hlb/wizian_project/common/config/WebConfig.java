@@ -1,4 +1,4 @@
-package com.hlb.wizian_project.students.config;
+package com.hlb.wizian_project.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

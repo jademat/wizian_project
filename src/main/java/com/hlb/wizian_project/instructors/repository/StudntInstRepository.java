@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface StudntRepository extends JpaRepository<Studnt, Long> {
+public interface StudntInstRepository extends JpaRepository<Studnt, Long> {
 
     // CourseStdntInstListDTO
     @Query("select distinct s from StudtList l join Studnt s on l.studnt.stdntNo = s.stdntNo where l.lectInfo.lectNo = :lectNo")

@@ -3,13 +3,12 @@ package com.hlb.wizian_project.instructors.service;
 import com.hlb.wizian_project.domain.*;
 import com.hlb.wizian_project.instructors.repository.LectApplyRepository;
 import com.hlb.wizian_project.instructors.repository.LectInfoRepository;
-import com.hlb.wizian_project.instructors.repository.StudntRepository;
+import com.hlb.wizian_project.instructors.repository.StudntInstRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ import java.util.Map;
 public class CourseServiceImpl implements CourseService {
 
     private final LectInfoRepository lectInfoMapper;
-    private final StudntRepository studentMapper;
+    private final StudntInstRepository studentMapper;
     private final LectApplyRepository lectApplyMapper;
     @Value("${inst.pagesize}")
     private int pageSize;

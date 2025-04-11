@@ -1,6 +1,6 @@
-package com.hlb.wizian_project.students.config;
+package com.hlb.wizian_project.common.config;
 
-import com.hlb.wizian_project.students.jwt.JwtAuthenticationFilter;
+import com.hlb.wizian_project.common.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,13 +19,13 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
-
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,12 +33,16 @@ public class SecurityConfig {
                 .cors().and()
                 .csrf().disable() // CSRF 필터 끔
                 .authorizeRequests() // URL 기반 인가 설정
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/", "/api/auth/**", "/api/auth/stdnt/**").permitAll() // 인증/인가 여부와 상관없이 접근 가능
-                .antMatchers("/api/auth/stdnt/forgot-password", "/api/auth/stdnt/verifyCode", "/api/auth/stdnt/reset-password").permitAll()
-                .antMatchers("/api/dashboard").authenticated() // 대시보드 URL은 인증된 사용자만 접근 가능
-                //.and()
-                //.formLogin()
+                // 관리자 로그인은 누구나 접근 가능
+                .antMatchers("/api/admins/admin/login").permitAll()
+                // 학생 관련 API는 누구나 접근 가능
+                .antMatchers("/api/auth/**", "/api/auth/stdnt/**", "/api/auth/stdnt/forgot-password", "/api/auth/stdnt/verifyCode", "/api/auth/stdnt/reset-password").permitAll()
+                // 대시보드는 인증된 사용자만 접근 가능
+                .antMatchers("/api/dashboard").authenticated()
+                // 관리자와 관련된 API는 인증된 사용자만 접근
+                .antMatchers(HttpMethod.PUT, "/api/admins/**").authenticated()
+                .antMatchers("/api/admins/**").authenticated()
+                .anyRequest().permitAll()  // 나머지 모든 요청은 인증 여부와 관계없이 접근 가능
                 .and()
                 .sessionManagement() // JWT 인증을 위해 STATELESS 설정
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

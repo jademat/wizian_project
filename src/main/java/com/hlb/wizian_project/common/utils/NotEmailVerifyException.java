@@ -1,4 +1,4 @@
-package com.hlb.wizian_project.students.custom;
+package com.hlb.wizian_project.common.utils;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

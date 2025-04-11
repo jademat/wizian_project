@@ -1,9 +1,9 @@
 package com.hlb.wizian_project.students.controller;
 
 import com.hlb.wizian_project.domain.Studnt;
-import com.hlb.wizian_project.students.jwt.JwtTokenProvider;
+import com.hlb.wizian_project.common.jwt.JwtTokenProvider;
 import com.hlb.wizian_project.students.service.StudntService;
-import com.hlb.wizian_project.students.utils.GoogleRecaptchaService;
+import com.hlb.wizian_project.common.utils.GoogleRecaptchaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

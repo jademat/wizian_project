@@ -1,8 +1,8 @@
 package com.hlb.wizian_project.admins.controller;
 
-import com.hlb.wizian_project.admins.jwt.JwtTokenProvider;
+import com.hlb.wizian_project.common.jwt.JwtTokenProvider;
 import com.hlb.wizian_project.admins.service.AdminService;
-import com.hlb.wizian_project.admins.utils.GoogleRecaptchaService;
+import com.hlb.wizian_project.common.utils.GoogleRecaptchaService;
 import com.hlb.wizian_project.domain.Admin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Optional;
 

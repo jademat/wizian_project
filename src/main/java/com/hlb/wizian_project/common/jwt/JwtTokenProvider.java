@@ -1,7 +1,6 @@
-package com.hlb.wizian_project.admins.jwt;
+package com.hlb.wizian_project.common.jwt;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -17,8 +16,9 @@ public class JwtTokenProvider {
 
     @Value("${jwt.secretKey}")
     private String secretString;
+
     @Value("${jwt.validity}")
-    private Long validity;
+    private long validity;
 
     private Key secretKey;
 
@@ -28,46 +28,50 @@ public class JwtTokenProvider {
         secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private String generateToken(String username, long expirationTime) {
+    // 토큰을 생성하는 메소드 (관리자와 학생 공통)
+    public String generateToken(String username) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + expirationTime); // expirationTime 인자를 사용
-
+        Date expiryDate = new Date(now.getTime() + validity);
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(now)
-                .setExpiration(expiration)
+                .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
-    public String generateToken(String username) {
-        return generateToken(username, validity); // 기본 validtiy 사용
+    // 토큰을 검증하는 메소드 (학생용은 username도 함께 검증)
+    public boolean validateToken(String token, String username) {
+        final String tokenUsername = extractUsername(token);
+        return tokenUsername.equals(username) && !isTokenExpired(token); // 학생 검증
     }
 
+    // 관리자용 validateToken (username 없이 단순히 토큰만 검증)
     public boolean validateToken(String token) {
-        return !isTokenExpired(token); // username 비교가 필요 없으므로, 단순히 만료 여부만 확인
+        return !isTokenExpired(token); // 관리자 검증
     }
 
+    // username을 토큰에서 추출
     public String extractUsername(String token) {
         return extractClaims(token).getSubject();
     }
 
+    // 토큰 만료 여부 확인
     private boolean isTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
     }
-
-    private Claims extractClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
-    }
-
     public String generateTokenFromRefresh(String refreshToken) {
         // 예시: Refresh token에서 정보를 추출하고, 새로운 액세스 토큰을 생성
         Claims claims = extractClaims(refreshToken);
         String username = claims.getSubject();
-        return generateToken(username, 3600000); // 액세스 토큰의 만료 시간을 1시간으로 설정
+        return generateToken(username); // 액세스 토큰의 만료 시간을 1시간으로 설정
     }
-
-    public String generateAccessToken(String username) {
-        return generateToken(username, 3600000); // 1시간 만료 시간
+    // 토큰에서 Claims 정보를 추출
+    private Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
