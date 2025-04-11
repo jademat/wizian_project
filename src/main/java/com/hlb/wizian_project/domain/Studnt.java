@@ -3,8 +3,10 @@ package com.hlb.wizian_project.domain;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+
 
 import java.time.LocalDateTime;
 
@@ -31,9 +33,9 @@ public class Studnt {
     private String stdntEmail;
 
     @Column
-    private String enable;
+    private String enable = "false";
 
-    @Column
+    @Column(name = "verifycode")
     private String verifycode;
 
     @Column(length = 50, nullable = false)
@@ -58,11 +60,16 @@ public class Studnt {
     @CreationTimestamp
     private LocalDateTime stdntRegdate;
 
-
     @Column
     private String role = "STUDENT";
 
     @Transient
-    @JsonProperty("g-recaptcha-response")
+    @JsonProperty("gRecaptchaResponse")
     private String gRecaptchaResponse;
+
+    @Column
+    private String resetToken;
+
+    @Column
+    private LocalDateTime tokenExpiry;
 }
