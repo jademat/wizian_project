@@ -4,6 +4,7 @@ import com.hlb.wizian_project.domain.*;
 import com.hlb.wizian_project.instructors.repository.LectApplyRepository;
 import com.hlb.wizian_project.instructors.repository.LectInfoRepository;
 import com.hlb.wizian_project.instructors.repository.StudntInstRepository;
+import com.hlb.wizian_project.instructors.repository.StudtListInstRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class CourseServiceImpl implements CourseService {
     private final LectInfoRepository lectInfoMapper;
     private final StudntInstRepository studentMapper;
     private final LectApplyRepository lectApplyMapper;
+    private final StudtListInstRepository studtListMapper;
     @Value("${inst.pagesize}")
     private int pageSize;
 
@@ -63,10 +65,7 @@ public class CourseServiceImpl implements CourseService {
         }
         // 학생, 출결 리스트 카운트
         int totalItems = studentAttendList.size();
-//        // 학생리스트 출력
-//        List<Studnt> students = studentMapper.findAll();
-//        // 수강신청 리스트 출력
-//        List<LectApply> applys = lectApplyMapper.findByApplyStatus("APPROVED");
+
         Map<String, List<?>> applyMap = new HashMap<>();
         // 학생리스트 출력
         applyMap.put("students", studentMapper.findAll());
@@ -81,6 +80,34 @@ public class CourseServiceImpl implements CourseService {
     @Transactional
     @Override
     public CourseStdntApplyListDTO findStudentListApplyInfoAttendList(int cpg, String sortStatus, String sortDate, String findkey, String loginInst) {
+        // 강사가 진행하는 수업정보 출력
+        LectInfo oneLectData = lectInfoMapper.findByInstNmAndLectStatus(loginInst, "OPEN");
+        // 강사가 진행하는 강의 번호 출력
+        int lectNo = oneLectData.getLectNo();
+        // 강사가 진행하는 수업을 듣는 학생, 출결 리스트 출력 - 검색
+        List<StudntAttendListDTO> studentAttendList = null;
+        if (!sortStatus.equals("default") && !sortDate.equals("default")) {
+            studentAttendList = studentMapper.findStudentAttendListSearchStatusAndGender(lectNo, sortStatus, sortDate);
+        } else if (!sortStatus.equals("default") && sortDate.equals("default")) {
+            studentAttendList = studentMapper.findStudentAttendListSearchStatus(lectNo, sortStatus);
+        } else if (sortStatus.equals("default") && !sortDate.equals("default")) {
+            studentAttendList = studentMapper.findStudentAttendListSearchGender(lectNo, sortDate);
+        }else {
+            studentAttendList = studentMapper.findStudentAttendList(lectNo);
+        }
+        if (!findkey.equals("all")) {
+            studentAttendList = studentMapper.findStudentAttendListSearchFindkey(lectNo, findkey);
+        }
+        // 학생, 출결 리스트 카운트
+        int totalItems = studentAttendList.size();
+
+        Map<String, List<?>> applyMap = new HashMap<>();
+        // 학생리스트 출력
+        applyMap.put("students", studentMapper.findAll());
+        // 수강신청 리스트 출력
+        applyMap.put("applys", lectApplyMapper.findByApplyStatus("APPROVED"));
+
+
         return null;
     }
 }
