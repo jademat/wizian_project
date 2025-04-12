@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 
 @Service
@@ -22,12 +24,11 @@ public class StudntServiceImpl implements StudntService {
 
     @Override
     public Studnt newStudnt(Studnt studnt) {
-        // 아이디 중복 체크
+
         if (studntRepository.existsByStdntId(studnt.getStdntId())) {
             throw new IllegalStateException("이미 존재하는 아이디입니다!!");
         }
 
-        // 이메일 중복 체크
         if (studntRepository.existsByStdntEmail(studnt.getStdntEmail())) {
             throw new IllegalStateException("이미 존재하는 이메일입니다!!");
         }
@@ -35,45 +36,71 @@ public class StudntServiceImpl implements StudntService {
         try {
             // 인증코드 생성
             String verificationCode = generateVerificationCode(studnt.getStdntEmail());
-            studnt.setVerifycode(verificationCode);  // 계정에 생성된 인증코드를 설정
+            studnt.setVerifycode(verificationCode);
 
             // 이메일로 인증 링크 발송
-            sendVerificationEmail(studnt.getStdntEmail(), studnt.getStdntId(), verificationCode); // 인증 링크 발송
+            sendVerificationEmail(studnt.getStdntEmail(), studnt.getStdntId(), verificationCode);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException("인증코드 발송 문제 발생!!");
         }
 
-        // 비밀번호 암호화 후 저장
         studnt.setPwd(passwordEncoder.encode(studnt.getPwd()));
         return studntRepository.save(studnt);
     }
 
-    // 6자리 인증 코드 생성
     @Override
     public String generateVerificationCode(String email) {
-        // 6자리 인증 코드 생성
         return RandomStringUtils.randomAlphanumeric(6);
     }
 
     // 회원가입 시 이메일 인증 링크 발송
     @Override
     public void sendVerificationEmail(String email, String userId, String verificationCode) {
-        // 인증 링크 생성 (회원가입 인증용 링크)
-        String verificationLink = "http://localhost:8080/api/auth/stdnt/verifyCode/" + userId + "/" + email + "/" + verificationCode;
+        try {
+            // 인증 링크 생성
+            String verificationLink = "http://localhost:3000/api/auth/stdnt/verifyCode/" + userId + "/" + email + "/" + verificationCode;
 
-        // 인증 링크 발송을 위한 이메일 준비
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("WIZIAN ACADEMI 회원가입 이메일 인증");
-        message.setText("안녕하세요^^ 가입해 주셔서 감사합니다!\n\n" +
-                "아래 링크를 클릭하여 이메일 인증을 완료 하셔야 로그인 가능합니다.\n\n" +
-                verificationLink); // 인증 링크 포함
+            // 이메일 내용
+            String htmlContent = "<!DOCTYPE html>"
+                    + "<html lang='ko'>"
+                    + "<head><meta charset='UTF-8'><title>WIZIAN 회원가입 이메일 인증</title></head>"
+                    + "<body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;'>"
+                    + "<div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 40px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);'>"
+                    + "<h2 style='color: #4CAF50;'>🎉 WIZIAN에 오신 것을 환영합니다!</h2>"
+                    + "<p style='font-size: 16px;'>안녕하세요, <strong>" + userId + "</strong>님!</p>"
+                    + "<p style='font-size: 16px;'>회원가입을 완료하려면 아래 버튼을 클릭하여 이메일 인증을 진행해주세요.</p>"
+                    + "<div style='text-align: center; margin: 30px 0;'>"
+                    + "<a href='" + verificationLink + "' style='background-color: #4CAF50; color: white; padding: 14px 25px; text-decoration: none; border-radius: 5px; font-size: 16px;'>"
+                    + "이메일 인증하기"
+                    + "</a>"
+                    + "</div>"
+                    + "<p style='font-size: 14px; color: #888;'>만약 버튼이 작동하지 않는다면 아래 링크를 복사해서 브라우저에 붙여넣으세요:</p>"
+                    + "<p style='font-size: 14px; word-break: break-all;'><a href='" + verificationLink + "' style='color: #4CAF50;'>" + verificationLink + "</a></p>"
+                    + "<hr style='margin-top: 40px;'>"
+                    + "<p style='font-size: 12px; color: #aaa;'>이 메일은 시스템에서 자동으로 발송된 메일입니다. 궁금한 점은 고객센터로 문의해주세요.</p>"
+                    + "</div>"
+                    + "</body>"
+                    + "</html>";
 
-        mailSender.send(message);
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            // 보내는 사람, 받는 사람, 제목 설정
+            helper.setFrom("noreply@wizian.com");
+            helper.setTo(email);
+            helper.setSubject("WIZIAN 회원가입 이메일 인증");
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalStateException("이메일 발송에 문제가 발생했습니다.");
+        }
     }
 
-    // 비밀번호 재설정을 위한 인증 코드 이메일 발송
+    // 비밀번호 재설정 인증 코드 이메일 발송
     @Override
     public void sendVerificationCodeEmail(String email, String verificationCode) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -81,11 +108,11 @@ public class StudntServiceImpl implements StudntService {
         message.setSubject("Wizian Academy 비밀번호 재설정 인증 코드");
         message.setText("안녕하세요.\n\n비밀번호 재설정을 위해 아래 인증 코드를 입력하세요:\n\n" + verificationCode);
 
-        mailSender.send(message);  // 이메일 발송
+        mailSender.send(message);
     }
 
 
-    // 인증 코드로 비밀번호 재설정 코드 검증
+    // 인증 코드로 비밀번호 재설정 코드
     @Override
     public boolean verifyPasswordResetCode(String code) {
         Optional<Studnt> user = studntRepository.findByVerifycode(code);
@@ -96,7 +123,7 @@ public class StudntServiceImpl implements StudntService {
     // 비밀번호 재설정
     @Override
     public void resetPasswordByCode(String code, String newPwd) {
-        // 비밀번호 복잡도 체크 (영어 + 숫자, 최소 6자 이상)
+        // 비밀번호 영어 + 숫자, 최소 6자 이상
         if (!newPwd.matches(".*[a-zA-Z].*") || !newPwd.matches(".*[0-9].*") || newPwd.length() < 6) {
             throw new IllegalArgumentException("비밀번호는 최소 6자 이상이어야 하며, 영어와 숫자가 포함되어야 합니다.");
         }
@@ -111,10 +138,10 @@ public class StudntServiceImpl implements StudntService {
         Studnt studnt = user.get();
 
         // 비밀번호 변경
-        studnt.setPwd(passwordEncoder.encode(newPwd));  // 새로운 비밀번호 암호화 후 설정
+        studnt.setPwd(passwordEncoder.encode(newPwd));
 
         try {
-            studntRepository.save(studnt);  // 새 비밀번호 저장
+            studntRepository.save(studnt);
         } catch (Exception e) {
             throw new IllegalStateException("비밀번호 변경 중 오류가 발생했습니다.");
         }
@@ -130,7 +157,6 @@ public class StudntServiceImpl implements StudntService {
         Studnt existing = studntRepository.findByStdntId(loginId)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
-        // 변경 가능한 항목만 업데이트
         if (updatedStudnt.getPwd() != null && !updatedStudnt.getPwd().isBlank()) {
             existing.setPwd(passwordEncoder.encode(updatedStudnt.getPwd()));
         }
@@ -153,9 +179,9 @@ public class StudntServiceImpl implements StudntService {
             throw new IllegalArgumentException("토큰이 만료되었습니다.");
         }
 
-        user.setPwd(passwordEncoder.encode(newPwd)); // 비밀번호 암호화 후 저장
-        user.setResetToken(null);                    // 토큰 제거 (재사용 방지)
-        user.setTokenExpiry(null);                   // 만료일 제거
+        user.setPwd(passwordEncoder.encode(newPwd));
+        user.setResetToken(null);
+        user.setTokenExpiry(null);
 
         studntRepository.save(user);
     }
@@ -206,9 +232,9 @@ public class StudntServiceImpl implements StudntService {
                 .findByStdntIdAndStdntEmailAndVerifycode(stdntId, stdntEmail, code);
 
         if (user.isPresent()) {
-            user.get().setVerifycode(null); // 인증코드 초기화
-            user.get().setEnable("true");  // 로그인 가능하도록 설정
-            studntRepository.save(user.get()); // 변경된 내용을 레포지토리로 넘김(db 바뀌게)
+            user.get().setVerifycode(null);
+            user.get().setEnable("true");
+            studntRepository.save(user.get());
             return true;
         }
         return false;
@@ -235,7 +261,7 @@ public class StudntServiceImpl implements StudntService {
 
     @Override
     public boolean existsByStdntId(String stdntId) {
-        return studntRepository.existsByStdntId(stdntId);  // 아이디 중복 체크
+        return studntRepository.existsByStdntId(stdntId);
     }
 
     @Override
