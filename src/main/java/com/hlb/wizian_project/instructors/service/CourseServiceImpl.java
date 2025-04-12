@@ -104,10 +104,10 @@ public class CourseServiceImpl implements CourseService {
         Map<String, List<?>> applyMap = new HashMap<>();
         // 학생리스트 출력
         applyMap.put("students", studentMapper.findAll());
-        // 수강신청 리스트 출력
-        applyMap.put("applys", lectApplyMapper.findByApplyStatus("APPROVED"));
+        // 출결리스트 출력
+        applyMap.put("applys", studtListMapper.findByLectInfo_LectNo(lectNo));
 
 
-        return null;
+        return new CourseStdntApplyListDTO(cpg, totalItems, pageSize, studentAttendList, applyMap);
     }
 }
