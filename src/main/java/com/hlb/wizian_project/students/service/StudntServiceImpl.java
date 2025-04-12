@@ -232,10 +232,31 @@ public class StudntServiceImpl implements StudntService {
             });
     }
 
+
     @Override
     public boolean existsByStdntId(String stdntId) {
         return studntRepository.existsByStdntId(stdntId);  // 아이디 중복 체크
     }
+
+    @Override
+    public Studnt findOrRegisterGoogleUser(String googleId, String name, String email) {
+        return studntRepository.findByStdntId(googleId)
+            .orElseGet(() -> {
+                Studnt newUser = Studnt.builder()
+                        .stdntId(googleId)
+                        .stdntNm(name)
+                        .stdntEmail(email)
+                        .pwd("google") // 임시 비밀번호
+                        .phone("01000000000")
+                        .zipCd("00000")
+                        .enable("true")
+                        .role("STUDENT")
+                        .loginType("GOOGLE")
+                        .build();
+                return studntRepository.save(newUser);
+            });
+    }
+
 }
 
 

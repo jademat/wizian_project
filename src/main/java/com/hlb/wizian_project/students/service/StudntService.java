@@ -32,4 +32,5 @@ public interface StudntService {
 
     Studnt findOrRegisterKakaoUser(String kakaoId, String nickname, String email);
 
+    Studnt findOrRegisterGoogleUser(String googleId, String name, String email);
 }
