@@ -27,6 +27,11 @@ public class StudntServiceImpl implements StudntService {
             throw new IllegalStateException("이미 존재하는 아이디입니다!!");
         }
 
+        // 이메일 중복 체크
+        if (studntRepository.existsByStdntEmail(studnt.getStdntEmail())) {
+            throw new IllegalStateException("이미 존재하는 이메일입니다!!");
+        }
+
         try {
             // 인증코드 생성
             String verificationCode = generateVerificationCode(studnt.getStdntEmail());
@@ -78,6 +83,7 @@ public class StudntServiceImpl implements StudntService {
 
         mailSender.send(message);  // 이메일 발송
     }
+
 
     // 인증 코드로 비밀번호 재설정 코드 검증
     @Override
@@ -209,7 +215,27 @@ public class StudntServiceImpl implements StudntService {
     }
 
     @Override
+    public Studnt findOrRegisterKakaoUser(String kakaoId, String nickname, String email) {
+        return studntRepository.findByStdntId(kakaoId)
+            .orElseGet(() -> {
+                Studnt newUser = Studnt.builder()
+                        .stdntId(kakaoId)
+                        .stdntNm(nickname)
+                        .stdntEmail(email)
+                        .pwd("kakao")
+                        .phone("01000000000")
+                        .enable("true")
+                        .role("STUDENT")
+                        .loginType("KAKAO")
+                        .build();
+                return studntRepository.save(newUser);
+            });
+    }
+
+    @Override
     public boolean existsByStdntId(String stdntId) {
         return studntRepository.existsByStdntId(stdntId);  // 아이디 중복 체크
     }
 }
+
+

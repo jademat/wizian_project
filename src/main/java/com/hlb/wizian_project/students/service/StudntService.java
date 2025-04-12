@@ -29,4 +29,7 @@ public interface StudntService {
     String generateVerificationCode(String email);
 
     void sendVerificationCodeEmail(String email, String verificationCode);
+
+    Studnt findOrRegisterKakaoUser(String kakaoId, String nickname, String email);
+
 }
