@@ -12,4 +12,6 @@ public interface CourseService {
     CourseStdntInstListDTO findOneLectListStdnt(int cpg, String loginInst);
 
     CourseStdntApplyListDTO findStudentListApplyInfo(int cpg, String sortStatus, String sortGender, String findkey, String loginInst);
+
+    CourseStdntApplyListDTO findStudentListApplyInfoAttendList(int cpg, String sortStatus, String sortDate, String findkey, String loginInst);
 }

@@ -40,6 +40,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
 
+    @Transactional
     @Override
     public CourseStdntApplyListDTO findStudentListApplyInfo(int cpg, String sortStatus, String sortGender, String findkey, String loginInst) {
         // 강사가 진행하는 수업정보 출력
@@ -74,5 +75,12 @@ public class CourseServiceImpl implements CourseService {
 
 
         return new CourseStdntApplyListDTO(cpg, totalItems, pageSize, studentAttendList, applyMap);
+    }
+
+
+    @Transactional
+    @Override
+    public CourseStdntApplyListDTO findStudentListApplyInfoAttendList(int cpg, String sortStatus, String sortDate, String findkey, String loginInst) {
+        return null;
     }
 }

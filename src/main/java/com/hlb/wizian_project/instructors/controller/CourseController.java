@@ -51,4 +51,18 @@ public class CourseController {
 
         return new ResponseEntity<>(courseStudentDTO, HttpStatus.OK);
     }
+
+
+    @GetMapping("/courseAttend/list/{sortStatus}/{sortDate}/{findkey}/{cpg}")
+    public ResponseEntity<?> courseAttend(Authentication authentication, @PathVariable int cpg,
+                                           @PathVariable String sortStatus, @PathVariable String sortDate, @PathVariable String findkey) {
+        // 로그인 된 강사 정보 추출
+        //UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        //String loginInst = userDetails.getUsername();
+        String loginInst = "김지훈";
+
+        CourseStdntApplyListDTO courseStudentDTO = courseService.findStudentListApplyInfoAttendList(cpg, sortStatus, sortDate, findkey, loginInst);
+
+        return new ResponseEntity<>(courseStudentDTO, HttpStatus.OK);
+    }
 }
