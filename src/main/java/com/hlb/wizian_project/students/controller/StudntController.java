@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -58,7 +58,7 @@ public class StudntController {
     public ResponseEntity<?> sendVerificationEmail(@RequestParam String email, @RequestParam String userId) {
         try {
             // 이메일 인증 링크 발송
-            studntService.sendVerificationEmail(email, userId, null); // 인증 코드 생성은 이미 서비스에서 이루어짐
+            studntService.sendVerificationEmail(email, userId, null);
             return ResponseEntity.ok("이메일 인증 링크가 발송되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -66,7 +66,7 @@ public class StudntController {
         }
     }
 
-    @GetMapping("/verifyCode/{userid}/{email}/{code}")
+    @GetMapping("/verifyCode/{userid}/{email:.+}/{code}")
     public ResponseEntity verifyCode(@PathVariable String userid,
                                      @PathVariable String email, @PathVariable String code) {
         ResponseEntity<?> response = ResponseEntity.ok().build();
@@ -105,23 +105,23 @@ public class StudntController {
         Optional<Studnt> user = studntRepository.findByStdntId(userId);
 
         if (!user.isPresent()) {
-            log.error("사용자 아이디: {}로 사용자를 찾을 수 없습니다.", userId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 아이디로 등록된 계정이 없습니다.");
         }
 
-        // 이메일로 인증 코드 발송
         try {
-            String verifycode = studntService.generateVerificationCode(user.get().getStdntEmail()); // 서비스에서 인증 코드 생성
-            // 생성된 인증코드를 Studnt 테이블에 저장
+            String verifycode = studntService.generateVerificationCode(user.get().getStdntEmail());
             Studnt studnt = user.get();
-            studnt.setVerifycode(verifycode);  // 인증코드 저장
-            studntRepository.save(studnt);  // DB에 저장
+            studnt.setVerifycode(verifycode);
+            studntRepository.save(studnt);
+            studntService.sendVerificationCodeEmail(studnt.getStdntEmail(), verifycode);
 
-            log.info("인증 코드가 저장된 값: {}", studnt.getVerifycode());
+            // 이메일을 함께 반환
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("email", studnt.getStdntEmail());
+            responseBody.put("message", "이메일 전송 성공");
 
-            studntService.sendVerificationCodeEmail(user.get().getStdntEmail(), verifycode); // 이메일 발송
+            return ResponseEntity.ok(responseBody);
 
-            return ResponseEntity.ok("비밀번호 재설정 링크가 이메일로 발송되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("인증 코드 발송에 실패했습니다.");
         }
