@@ -24,18 +24,5 @@ public class ArchiveServiceImpl implements ArchiveService {
     private int pageSize;
 
 
-    @Transactional
-    @Override
-    public CourseStdntInstListDTO findOneLectListStdnt(int cpg, String loginInst) {
-        // 강사가 진행하는 수업정보 출력
-        LectInfo oneLectData = lectInfoMapper.findByInstNmAndLectStatus(loginInst, "OPEN");
-        // 강사가 진행하는 강의 번호 출력
-        int lectNo = oneLectData.getLectNo();
-        // 강사가 진행하는 수업을 듣는 학생리스트 출력
-        List<Studnt> students = studentMapper.findLectStudentList(lectNo);
-        // 학생리스트 카운트
-        int totalItems = students.size();
 
-        return new CourseStdntInstListDTO(cpg, totalItems, pageSize, students, oneLectData);
-    }
 }
