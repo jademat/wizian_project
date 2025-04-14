@@ -1,7 +1,9 @@
 package com.hlb.wizian_project.admins.controller;
 
 import com.hlb.wizian_project.admins.domain.InstDTO;
+import com.hlb.wizian_project.admins.repository.AdInstRepository;
 import com.hlb.wizian_project.admins.service.AdInstService;
+import com.hlb.wizian_project.domain.Courses;
 import com.hlb.wizian_project.domain.Inst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +26,8 @@ import java.util.Optional;
 @Slf4j
 public class AdInstController {
     private final AdInstService adInstService;
+    private final AdInstRepository instRepository;
+
 
     @GetMapping("/list")
     public Page<Inst> getInsts(
@@ -41,5 +46,22 @@ public class AdInstController {
         return inst.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerCourse(@RequestBody Inst inst) {
+        try {
+            adInstService.newInst(inst);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("서버 오류 발생");
+        }
+    }
+
+    @GetMapping("/list-all")
+    public ResponseEntity<List<Inst>> getAllInstructors() {
+        return ResponseEntity.ok(instRepository.findAll());
+    }
+
 
 }

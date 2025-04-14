@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface AdInstService {
     Page<Inst> getInsts(String search, Pageable pageable);
     Optional<Inst> getInstById(int instNo);
-
+    Inst newInst(Inst inst);
 }

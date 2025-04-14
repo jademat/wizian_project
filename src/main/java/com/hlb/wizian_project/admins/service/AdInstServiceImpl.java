@@ -33,4 +33,9 @@ public class AdInstServiceImpl implements AdInstService {
         return adInstRepository.findById(instNo);
     }
 
+    @Override
+    public Inst newInst(Inst inst) {
+        return adInstRepository.save(inst);
+    }
+
 }
