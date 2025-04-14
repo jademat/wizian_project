@@ -76,4 +76,32 @@ public class CourseController {
 
         return new ResponseEntity<>(courseStudentDTO, HttpStatus.OK);
     }
+
+
+    @GetMapping("/courseGrade/list/{sortAttend}/{sortProNm}/{findkey}/{findkeySub}/{cpg}")
+    public ResponseEntity<?> courseGrade(Authentication authentication, @PathVariable int cpg,
+                                           @PathVariable String sortAttend, @PathVariable String sortProNm, @PathVariable String findkey, @PathVariable String findkeySub) {
+        // 로그인 된 강사 정보 추출
+        //UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        //String loginInst = userDetails.getUsername();
+        String loginInst = "김지훈";
+
+        CourseGradeListInstDTO courseGradeDTO = courseService.findGradeInfoList(cpg, sortAttend, sortProNm, findkey, findkeySub, loginInst);
+
+        return new ResponseEntity<>(courseGradeDTO, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/courseGrade/stdentList/{studentNo}")
+    public ResponseEntity<?> courseGradeInfo(Authentication authentication, @PathVariable int studentNo) {
+        log.info(">>>>>> courseGradeInfo 호출");
+        // 로그인 된 강사 정보 추출
+        //UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        //String loginInst = userDetails.getUsername();
+        String loginInst = "김지훈";
+
+        AttendGradeDTO courseGradeDTO = courseService.findStudentAttendInfo(studentNo, loginInst);
+
+        return new ResponseEntity<>(courseGradeDTO, HttpStatus.OK);
+    }
 }

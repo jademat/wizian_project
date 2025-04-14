@@ -13,4 +13,8 @@ public interface CourseService {
     CourseStdntApplyListDTO findStudentListApplyInfoAttendList(int cpg, String sortStatus, String sortDate, String findkey, String loginInst);
 
     CourseProblemListInstDTO findProblemInfoList(int cpg, String sortYear, String sortHalf, String findkey, String loginInst);
+
+    CourseGradeListInstDTO findGradeInfoList(int cpg, String sortAttend, String sortProNm, String findkey, String findkeySub, String loginInst);
+
+    AttendGradeDTO findStudentAttendInfo(int studentNo, String loginInst);
 }

@@ -28,4 +28,7 @@ public interface StudntInstRepository extends JpaRepository<Studnt, Long> {
     @Query("select distinct new com.hlb.wizian_project.domain.StudntAttendListDTO(l.studnt.stdntNo, l.studnt.stdntId, l.studnt.stdntNm, l.studnt.stdntEmail, l.studnt.phone, l.attendDate, l.attendStatus) from StudtList l where l.lectInfo.lectNo = :lectNo")
     List<StudntAttendListDTO> findStudentAttendList(@Param("lectNo") int lectNo);
 
+    // findStudentAttendInfo
+    @Query("select stdntNm from Studnt where stdntNo = :stdntNo")
+    String findStdntNmByStdntNo(int stdntNo);
 }

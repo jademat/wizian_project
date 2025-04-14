@@ -25,6 +25,8 @@ public class CourseServiceImpl implements CourseService {
     private final StudtListInstRepository studtListMapper;
     private final AssignInfoInstRepository assignInfoMapper;
     private final AssignSubmitInstRepository assignSubmitMapper;
+    private final GradesInstRepository gradesMapper;
+
     @Value("${inst.pagesize}")
     private int pageSize;
 
@@ -146,5 +148,71 @@ public class CourseServiceImpl implements CourseService {
 
 
         return new CourseProblemListInstDTO(cpg, totalItems, pageSize, ProblemInfoList, classes);
+    }
+
+
+    @Transactional
+    @Override
+    public CourseGradeListInstDTO findGradeInfoList(int cpg, String sortAttend, String sortProNm, String findkey, String findkeySub, String loginInst) {
+        Pageable pageable = PageRequest.of(cpg - 1, 5, Sort.Direction.ASC, "gradesNo");
+        // 강사가 진행하는 수업정보 출력
+        LectInfo oneLectData = lectInfoMapper.findByInstNmAndLectStatus(loginInst, "OPEN");
+        // 강사가 진행하는 강의 번호 출력
+        int lectNo = oneLectData.getLectNo();
+        // 학생 성적 리스트 출력 - 검색
+        Page<Grades> GradeInfoList = null;
+//        if (!sortAttend.equals("default") && !sortProNm.equals("default")) {
+//            GradeInfoList = gradesMapper.findBy(sortAttend, sortProNm);
+//        } else if (!sortAttend.equals("default") && sortProNm.equals("default")) {
+//            GradeInfoList = gradesMapper.findByLectInfo_LectNoAndAssignInfoYear(sortAttend);
+//        } else if (sortAttend.equals("default") && !sortProNm.equals("default")) {
+//            GradeInfoList = gradesMapper.findByLectInfo_LectNoAndAssignInfoMonth(sortProNm);
+//        }else {
+//            GradeInfoList = gradesMapper.findByLectInfo_LectNo();
+//        }
+
+        GradeInfoList = gradesMapper.findByLectApply_LectInfo_LectNo(lectNo, pageable);
+
+        // 학생 과제정보 리스트 출력
+        List<ProblemGradeDTO> problemGradeList = assignSubmitMapper.findproblemGradeList(lectNo);
+
+//        if (!findkey.equals("all") && !findkeySub.equals("all")) {
+//            GradeInfoList = gradesMapper.findByLectApply_LectInfo_LectNoAndStudnt_StdntNmAnd(lectNo, findkey, findkeySub);
+//        } else if (findkey.equals("all") && !findkeySub.equals("all")) {
+//            GradeInfoList = gradesMapper.findByLectApply_LectInfo_LectNoAndStudnt_StdntNm(lectNo, findkey);
+//        } else {
+//            GradeInfoList = gradesMapper.findByLectApply_LectInfo_LectNoAnd(lectNo, findkeySub);
+//        }
+        List<Grades> classes = GradeInfoList.getContent();
+        int totalItems = (int) GradeInfoList.getTotalElements();
+
+        return new CourseGradeListInstDTO(cpg, totalItems, pageSize, problemGradeList, classes);
+    }
+
+
+    @Override
+    public AttendGradeDTO findStudentAttendInfo(int studentNo, String loginInst) {
+        // 강사가 진행하는 수업정보 출력
+        LectInfo oneLectData = lectInfoMapper.findByInstNmAndLectStatus(loginInst, "OPEN");
+        // 강사가 진행하는 강의 번호 출력
+        int lectNo = oneLectData.getLectNo();
+        // 강사가 진행하는 강의를 듣는 학생의 출석정보 출력
+        List<StudtList> StudtOne = studtListMapper.findByLectInfo_LectNoAndStudnt_StdntNo(lectNo, studentNo);
+        // 해당학생의 출석일수 계산
+        int attendTime = studtListMapper.countByLectInfo_LectNoAndStudnt_StdntNoAndAttendStatus(lectNo, studentNo, 1);
+        // 해당학생의 지각일수 계산
+        int lateTime = studtListMapper.countByLectInfo_LectNoAndStudnt_StdntNoAndAttendStatus(lectNo, studentNo, 2);
+        // 해당학생의 결석일수 계산
+        int absTime = studtListMapper.countByLectInfo_LectNoAndStudnt_StdntNoAndAttendStatus(lectNo, studentNo, 0);
+
+        AttendGradeDTO attendGrade = new AttendGradeDTO();
+        attendGrade.setStdntNo(studentNo);
+        attendGrade.setStdntNm(studentMapper.findStdntNmByStdntNo(studentNo));
+        attendGrade.setFullTime(lectInfoMapper.findFullTimeByLectNo(lectNo));
+        attendGrade.setAttendTime(attendTime);
+        attendGrade.setLateTime(lateTime);
+        attendGrade.setAbsTime(absTime);
+
+        return attendGrade;
     }
 }

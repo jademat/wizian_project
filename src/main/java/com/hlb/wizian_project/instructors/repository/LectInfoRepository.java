@@ -4,6 +4,7 @@ import com.hlb.wizian_project.domain.LectInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -20,4 +21,8 @@ public interface LectInfoRepository extends JpaRepository<LectInfo, Long> {
 
     // findOneLectListStdnt
     LectInfo findByInstNmAndLectStatus(String loginInst, String lectStatus);
+
+    // findStudentAttendInfo
+    @Query("select l.courses.fullTime from LectInfo l where l.lectNo = :lectNo")
+    int findFullTimeByLectNo(int lectNo);
 }
