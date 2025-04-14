@@ -12,14 +12,12 @@ public class MyProblemListInstDTO {
     private int cntpg;  // 전체 페이지 수
     private int edblk; // 페이지당 끝나는 게시물 번호
     private List<?> InfoList;
-    private List<?> submitList;
 
     // 페이지네이션 수식 계산을 생성자에서 수행
-    public MyProblemListInstDTO(int cpg, int totalItems, int pageSize, List<?> InfoList, List<?> submitList) {
+    public MyProblemListInstDTO(int cpg, int totalItems, int pageSize, List<?> InfoList) {
         this.cpg = cpg;
         this.cntpg = (int)Math.ceil((double)totalItems / pageSize);    // 총 페이지수를 구하는 코드
         this.InfoList = InfoList;
-        this.submitList = submitList;
 
         // 페이지네이션 범위 게산
         this.stblk = ((cpg - 1) / 10) * 10 + 1; // 한 페이지에 보여줄 페이지블럭의 첫 번째 번호를 가져옴

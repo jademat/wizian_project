@@ -15,4 +15,7 @@ public interface AssignInfoInstRepository extends JpaRepository<AssignInfo, Long
     List<AssignInfo> findByLectInfo_LectNoAndAssignInfoYear(int lectNo, @RequestParam String sortYear);
     List<AssignInfo> findByLectInfo_LectNoAndAssignInfoMonth(int lectNo, @RequestParam String sortHalf);
     List<AssignInfo> findByLectInfo_LectNoAndAssignInfoNm(int lectNo, @RequestParam String findkey);
+
+    // archiveMyProblem
+    int countByLectInfo_LectNo(int lectInfoLectNo);
 }

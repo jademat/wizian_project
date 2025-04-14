@@ -29,7 +29,6 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Transactional
     @Override
     public MyProblemListInstDTO archiveMyProblem(int cpg, String sortYear, String sortHalf, String findkey, String loginInst) {
-        Pageable pageable = PageRequest.of(cpg - 1, 5, Sort.Direction.ASC, "assignInfo.assignQnum");
         // 강사가 진행하는 수업정보 출력
         LectInfo oneLectData = lectInfoMapper.findByInstNmAndLectStatus(loginInst, "OPEN");
         // 강사가 진행하는 강의 번호 출력
@@ -48,8 +47,9 @@ public class ArchiveServiceImpl implements ArchiveService {
         if (!findkey.equals("all")) {
             ProblemInfoList = assignInfoMapper.findByLectInfo_LectNoAndAssignInfoNm(lectNo, findkey);
         }
+        int totalItems = assignInfoMapper.countByLectInfo_LectNo(lectNo);
 
 
-        return null;
+        return new MyProblemListInstDTO(cpg, totalItems, pageSize, ProblemInfoList);
     }
 }
