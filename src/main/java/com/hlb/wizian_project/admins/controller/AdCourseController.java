@@ -1,6 +1,7 @@
 package com.hlb.wizian_project.admins.controller;
 
 import com.hlb.wizian_project.admins.domain.CoursesDTO;
+import com.hlb.wizian_project.admins.repository.AdCourseRepository;
 import com.hlb.wizian_project.admins.service.AdCourseService;
 import com.hlb.wizian_project.domain.Courses;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +25,7 @@ import java.util.Optional;
 public class AdCourseController {
 
     private final AdCourseService courseService;
+    private final AdCourseRepository courseRepository;
 
     @GetMapping("/coulist")
     public Page<CoursesDTO> getCourses(
@@ -62,6 +65,10 @@ public class AdCourseController {
         }
     }
 
+    @GetMapping("/list-all")
+    public ResponseEntity<List<Courses>> getAllCourses() {
+        return ResponseEntity.ok(courseRepository.findAll());
+    }
 
 
 }
