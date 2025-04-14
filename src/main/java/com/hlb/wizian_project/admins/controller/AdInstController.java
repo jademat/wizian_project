@@ -1,9 +1,9 @@
 package com.hlb.wizian_project.admins.controller;
 
-import com.hlb.wizian_project.admins.domain.InstDTO;
+
+import com.hlb.wizian_project.admins.domain.InstLectureDTO;
 import com.hlb.wizian_project.admins.repository.AdInstRepository;
 import com.hlb.wizian_project.admins.service.AdInstService;
-import com.hlb.wizian_project.domain.Courses;
 import com.hlb.wizian_project.domain.Inst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +61,12 @@ public class AdInstController {
     @GetMapping("/list-all")
     public ResponseEntity<List<Inst>> getAllInstructors() {
         return ResponseEntity.ok(instRepository.findAll());
+    }
+
+    @GetMapping("/inst/{instNo}/lectures")
+    public ResponseEntity<List<InstLectureDTO>> getLecturesByInstructor(@PathVariable int instNo) {
+        List<InstLectureDTO> lectures = adInstService.getLecturesByInstructor(instNo);
+        return ResponseEntity.ok(lectures);
     }
 
 
