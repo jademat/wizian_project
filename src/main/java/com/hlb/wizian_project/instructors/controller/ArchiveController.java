@@ -19,7 +19,16 @@ public class ArchiveController {
 
     private final ArchiveService archiveService;
 
+    @GetMapping("/myProblem/list/{sortYear}/{sortHalf}/{findkey}/{cpg}")
+    public ResponseEntity<?> myProblem(Authentication authentication, @PathVariable int cpg,
+                                           @PathVariable String sortYear, @PathVariable String sortHalf, @PathVariable String findkey) {
+        // 로그인 된 강사 정보 추출
+        //UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        //String loginInst = userDetails.getUsername();
+        String loginInst = "김지훈";
 
+        MyProblemListInstDTO myProblemDto = archiveService.archiveMyProblem(cpg, sortYear, sortHalf, findkey, loginInst);
 
-
+        return new ResponseEntity<>(myProblemDto, HttpStatus.OK);
+    }
 }
