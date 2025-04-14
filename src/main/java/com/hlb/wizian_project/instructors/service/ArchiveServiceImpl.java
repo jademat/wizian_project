@@ -21,6 +21,8 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     private final LectInfoRepository lectInfoMapper;
     private final AssignInfoInstRepository assignInfoMapper;
+    private final AssignSubmitInstRepository assignSubmitMapper;
+    private final LectApplyRepository lectApplyMapper;
 
     @Value("${inst.pagesize}")
     private int pageSize;
@@ -49,7 +51,21 @@ public class ArchiveServiceImpl implements ArchiveService {
         }
         int totalItems = assignInfoMapper.countByLectInfo_LectNo(lectNo);
 
-
         return new MyProblemListInstDTO(cpg, totalItems, pageSize, ProblemInfoList);
+    }
+
+
+    @Override
+    public Map<String, Long> archiveMyProblemCountSubmit(int infoNo, String infoNm, String loginInst) {
+        // 해당강의를 듣는 총 학생 수
+        Long totalStudent = lectApplyMapper.countByLectInfo_LectNoAndApplyStatus(infoNo, "APPROVED");
+        // 해당 과제를 제출한 인원수 출력
+        Long countSubmit = assignSubmitMapper.countByAssignInfo_AssignInfoNoAndAssignInfo_AssignInfoNm(infoNo, infoNm);
+
+        Map<String, Long> params = new HashMap<>();
+        params.put("totalStudent", totalStudent);
+        params.put("countSubmit", countSubmit);
+
+        return params;
     }
 }
