@@ -20,16 +20,6 @@ public class ArchiveController {
     private final ArchiveService archiveService;
 
 
-    @GetMapping("/courseInfo/list/{cpg}")
-    public ResponseEntity<?> courseInfo(Authentication authentication, @PathVariable int cpg) {
-        // 로그인 된 강사 정보 추출
-        //UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        //String loginInst = userDetails.getUsername();
-        String loginInst = "김지훈";
 
-        CourseStdntInstListDTO courseInfoDTO = courseService.findOneLectListStdnt(cpg, loginInst);
-
-        return new ResponseEntity<>(courseInfoDTO, HttpStatus.OK);
-    }
 
 }
