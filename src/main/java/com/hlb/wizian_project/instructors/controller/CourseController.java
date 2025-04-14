@@ -1,9 +1,6 @@
 package com.hlb.wizian_project.instructors.controller;
 
-import com.hlb.wizian_project.domain.CourseInstListDTO;
-import com.hlb.wizian_project.domain.CourseStdntApplyListDTO;
-import com.hlb.wizian_project.domain.CourseStdntInstListDTO;
-import com.hlb.wizian_project.domain.LectInfoInstListDTO;
+import com.hlb.wizian_project.domain.*;
 import com.hlb.wizian_project.instructors.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +59,20 @@ public class CourseController {
         String loginInst = "김지훈";
 
         CourseStdntApplyListDTO courseStudentDTO = courseService.findStudentListApplyInfoAttendList(cpg, sortStatus, sortDate, findkey, loginInst);
+
+        return new ResponseEntity<>(courseStudentDTO, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/courseProblem/list/{sortYear}/{sortHalf}/{findkey}/{cpg}")
+    public ResponseEntity<?> courseProblem(Authentication authentication, @PathVariable int cpg,
+                                          @PathVariable String sortYear, @PathVariable String sortHalf, @PathVariable String findkey) {
+        // 로그인 된 강사 정보 추출
+        //UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        //String loginInst = userDetails.getUsername();
+        String loginInst = "김지훈";
+
+        CourseProblemListInstDTO courseStudentDTO = courseService.findProblemInfoList(cpg, sortYear, sortHalf, findkey, loginInst);
 
         return new ResponseEntity<>(courseStudentDTO, HttpStatus.OK);
     }
