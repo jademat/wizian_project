@@ -3,8 +3,13 @@ package com.hlb.wizian_project.domain;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "inst")
@@ -48,5 +53,5 @@ public class Inst {
     private String email;
 
     @CreationTimestamp
-    private java.time.LocalDateTime instDate;
+    private LocalDateTime instDate;
 }

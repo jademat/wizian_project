@@ -22,7 +22,7 @@ public class AdInstServiceImpl implements AdInstService {
     private final AdInstRepository adInstRepository;
 
     @Override
-    public Page<InstDTO> getInsts(String search, Pageable pageable) {
+    public Page<Inst> getInsts(String search, Pageable pageable) {
         return (search == null || search.trim().isEmpty())
                 ? adInstRepository.findAllInstDtos(pageable)
                 : adInstRepository.searchInsts(search, pageable);

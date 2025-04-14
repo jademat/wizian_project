@@ -15,10 +15,10 @@ public interface AdInstRepository extends JpaRepository<Inst, Integer> {
             "OR LOWER(i.instNm) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "OR LOWER(i.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "ORDER BY i.instNo DESC")
-    Page<InstDTO> searchInsts(@Param("search") String search, Pageable pageable);
+    Page<Inst> searchInsts(@Param("search") String search, Pageable pageable);
 
     @Query("SELECT i FROM Inst i ORDER BY i.instNo DESC")
-    Page<InstDTO> findAllInstDtos(Pageable pageable);
+    Page<Inst> findAllInstDtos(Pageable pageable);
 
 
 }

@@ -2,6 +2,7 @@ package com.hlb.wizian_project.admins.controller;
 
 import com.hlb.wizian_project.admins.domain.InstDTO;
 import com.hlb.wizian_project.admins.service.AdInstService;
+import com.hlb.wizian_project.domain.Inst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,11 +25,11 @@ public class AdInstController {
     private final AdInstService adInstService;
 
     @GetMapping("/list")
-    public Page<InstDTO> getInsts(
+    public Page<Inst> getInsts(
             @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = "instNo", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<InstDTO> result = adInstService.getInsts(search, pageable);
+        Page<Inst> result = adInstService.getInsts(search, pageable);
         if (result.isEmpty()) {
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
