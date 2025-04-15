@@ -106,11 +106,12 @@ public class AdminController {
             refreshToken = refreshToken.substring(7); // 'Bearer ' 부분 제거
         }
 
-        if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
-            String newAccessToken = jwtTokenProvider.generateTokenFromRefresh(refreshToken);
-            // JSON 응답을 반환해야 합니다.
-            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));  // 수정된 부분
-        }
+        if (jwtTokenProvider.validateToken(refreshToken))
+            if (refreshToken != null) {
+                String newAccessToken = jwtTokenProvider.generateTokenFromRefresh(refreshToken);
+                // JSON 응답을 반환해야 합니다.
+                return ResponseEntity.ok(Map.of("accessToken", newAccessToken));  // 수정된 부분
+            }
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid refresh token");
     }
