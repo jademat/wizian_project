@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -67,19 +69,66 @@ public class StudntController {
     }
 
     @GetMapping("/verifyCode/{userid}/{email:.+}/{code}")
-    public ResponseEntity verifyCode(@PathVariable String userid,
-                                     @PathVariable String email, @PathVariable String code) {
-        ResponseEntity<?> response = ResponseEntity.ok().build();
+    public void verifyCode(@PathVariable String userid,
+                           @PathVariable String email,
+                           @PathVariable String code,
+                           HttpServletResponse res) throws IOException {
 
-        if (studntService.verifyEmail(userid, email, code)) {
-            response = ResponseEntity.ok().body("이메일 인증이 완료되었습니다!!");
-        } else {
-            response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("이메일 인증 실패!! - 코드를 다시 확인하세요!!");
+        // 인증 상태 확인 (예시: DB에서 해당 사용자 및 코드 확인)
+        String result = "fail";  // enable 기본 값은 실패로 설정 -- 이 때는 로그인 되면 안됨
+
+        // 실제로 인증 여부 확인 로직
+        boolean isVerified = checkIfVerified(userid, email, code);  // 인증 상태 확인 메서드
+        //boolean isAlreadyVerified = checkIfAlreadyVerified(userid); // 이미 인증된 계정 확인 메서드
+
+        log.info(">> {} {} {}", userid, email, code);
+//        log.info(">> {} {}", isVerified, isAlreadyVerified);
+        log.info(">> {} {}", isVerified);
+
+        // 회원 정보 테이블에 enable의 값을 true로 변경
+        if (isVerified) {
+            // 사용자 정보를 가져옴
+            Optional<Studnt> studentOptional = studntRepository.findByStdntId(userid);
+
+            if (studentOptional.isPresent()) {
+                Studnt student = studentOptional.get();
+                // enable 값을 "true"로 변경
+                student.setEnable("true");
+                // 업데이트된 엔티티 저장
+                studntRepository.save(student);  // DB에 변경된 정보 저장
+                result = "ok";  // 인증 성공 시
+            } else {
+                log.error("사용자를 찾을 수 없습니다.");
+            }
         }
 
-        return response;
+        String redirectUrl = "http://localhost:3000/verifyEmail/" + result;
+        res.sendRedirect(redirectUrl);
     }
+
+
+    private boolean checkIfVerified(String userid, String email, String code) {
+        boolean result = false;
+        // DB에서 사용자 정보 가져오기
+        Optional<Studnt> user = studntRepository.findByStdntIdAndStdntEmailAndVerifycode(userid, email, code);
+        log.info(">> {} ", user.get().getStdntNm());
+
+        if (user.isPresent()) {
+            // 사용자 정보가 있고, 인증안되었으면 enable이 "false"여야 함
+            result = user.get().getEnable().equals("false");
+        }
+        return result;
+    }
+
+
+    private boolean checkIfAlreadyVerified(String userid) {
+        Optional<Studnt> user = studntRepository.findByStdntId(userid);
+
+        // 사용자 정보가 있고, enable이 "true"라면 이미 인증된 상태
+        return user.isPresent() && "true".equals(user.get().getEnable());
+    }
+
+
 
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestBody Studnt updatedStudnt, Authentication authentication) {

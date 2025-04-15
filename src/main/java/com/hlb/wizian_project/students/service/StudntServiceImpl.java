@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -59,7 +60,7 @@ public class StudntServiceImpl implements StudntService {
     public void sendVerificationEmail(String email, String userId, String verificationCode) {
         try {
             // 인증 링크 생성
-            String verificationLink = "http://localhost:3000/api/auth/stdnt/verifyCode/" + userId + "/" + email + "/" + verificationCode;
+            String verificationLink = "http://localhost:8080/api/auth/stdnt/verifyCode/" + userId + "/" + email + "/" + verificationCode;
 
             // 이메일 내용
             String htmlContent = "<!DOCTYPE html>"
@@ -281,6 +282,23 @@ public class StudntServiceImpl implements StudntService {
                         .build();
                 return studntRepository.save(newUser);
             });
+    }
+
+    @Override
+    public Studnt loginStudent(String stdntId, String pwd) {
+        Optional<Studnt> studentOptional = studntRepository.findByStdntId(stdntId);
+
+        if (studentOptional.isEmpty() || !passwordEncoder.matches(pwd, studentOptional.get().getPwd())) {
+            throw new BadCredentialsException("아이디 또는 비밀번호가 틀렸습니다.");
+        }
+
+        Studnt student = studentOptional.get();
+
+        if (!"true".equals(student.getEnable())) {
+            throw new IllegalStateException("이메일 인증이 완료되지 않았습니다.");
+        }
+
+        return student;
     }
 
 }

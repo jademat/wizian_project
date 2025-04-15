@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -41,61 +42,53 @@ public class KakaoController {
     private final StudntService studntService;
 
     // 카카오 로그인 - 로그인 후 인가 코드 받기
-    @GetMapping("/login")
-    public String kakaoLogin() {
-        String authorizeUrl = "https://kauth.kakao.com/oauth/authorize";
-        String params = "?client_id=%s&redirect_uri=%s&response_type=code&prompt=login";
-        String kakaoUrl = String.format(authorizeUrl+params, clientId, redirectUri);
-
-        return "redirect:"+kakaoUrl;
-    }
+//    @GetMapping("/login")
+//    public String kakaoLogin() {
+//        String authorizeUrl = "https://kauth.kakao.com/oauth/authorize";
+//        String params = "?client_id=%s&redirect_uri=%s&response_type=code&prompt=login";
+//        String kakaoUrl = String.format(authorizeUrl+params, clientId, redirectUri);
+//
+//        return "redirect:"+kakaoUrl;
+//    }
 
     // 카카오 인증 후 redirect 엔드포인트 - 인가 코드를 이용해서 액세스토큰 받기
-    @GetMapping("/callback")
-    public String kakaoCallback(@RequestParam String code) {
-        log.info("인가 코드: {}", code);
+    @PostMapping("/kakaoToken")
+    public ResponseEntity<?> kakaoToken(@RequestBody Map<String, String> kakaoToken) {
+        ResponseEntity<?> response = ResponseEntity.internalServerError().build();
 
-        String authorizeUrl = "https://kauth.kakao.com/oauth/token";
-        String params = "?client_id=%s&redirect_uri=%s&code=%s&grant_type=authorization_code";
-        String kakaoUrl = String.format(authorizeUrl + params, clientId, redirectUri, code);
+        AccessToken = kakaoToken.get("access_token");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        HttpEntity<String> request = new HttpEntity<>(headers);
+        log.info("액세스 토큰: {}", AccessToken);
 
         try {
-            // 1. 토큰 요청
-            ResponseEntity<KakaoTokenResponse> response = restTemplate.postForEntity(
-                    kakaoUrl, request, KakaoTokenResponse.class
-            );
-
-            KakaoTokenResponse tokenResponse = response.getBody();
-            if (tokenResponse != null) {
-                AccessToken = tokenResponse.getAccess_token();
-                log.info("Access token: {}", AccessToken);
-            }
-
-            // 2. 사용자 정보 요청
             KakaoUserInfo kakaoUserInfo = getUserInfo(AccessToken);
             String kakaoId = kakaoUserInfo.getId().toString();
             String nickname = kakaoUserInfo.getProperties().getNickname();
             String email = (kakaoUserInfo.getKakao_account() != null && kakaoUserInfo.getKakao_account().getEmail() != null)
                     ? kakaoUserInfo.getKakao_account().getEmail()
                     : kakaoId + "@kakao.com"; // 기본 이메일 형식
+            log.info(">> {}{}{}", kakaoId, nickname, email);
 
             // 3. DB 사용자 등록 or 조회 (서비스 통해)
-            Studnt user = studntService.findOrRegisterKakaoUser(kakaoId, nickname, email); // ✅ 변경된 부분
+            Studnt user = studntService.findOrRegisterKakaoUser(kakaoId, nickname, email);
 
             // 4. JWT 발급
-            String encodedNickname = URLEncoder.encode(user.getStdntNm(), StandardCharsets.UTF_8);
-            String token = jwtTokenProvider.generateToken(user.getStdntId());
+            String jwtToken = jwtTokenProvider.generateToken(user.getStdntId());
 
-            return "redirect:http://localhost:3000/dashboard?nickname=" + encodedNickname + "&token=" + token;
+            // 생성한 토큰을 JSON 형식으로 만듦
+            Map<String, String> tokens = Map.of(
+                    "accessToken", jwtToken
+            );
+            response = ResponseEntity.ok().body(tokens);
+
 
         } catch (Exception e) {
             log.error("Error getting token or user info: {}", e.getMessage());
-            return "redirect:http://localhost:3000/pageLogin";
+            response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("아이디나 비밀번호가 일치하지 않습니다!!");
         }
+
+        return response;
     }
 
 
@@ -170,4 +163,3 @@ public class KakaoController {
         return "redirect:" + logoutUrl + params;
     }
 }
-
