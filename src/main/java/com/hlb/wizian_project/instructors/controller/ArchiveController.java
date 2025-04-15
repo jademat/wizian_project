@@ -47,4 +47,7 @@ public class ArchiveController {
 
         return new ResponseEntity<>(countData, HttpStatus.OK);
     }
+
+    // TODO: myBoard 부터 해야함 - 프로젝트 기간종료로 인한 기능 개발 중지
+    // FIXME : 프론트 미 완성
 }
