@@ -13,4 +13,6 @@ public interface LectApplyRepository extends JpaRepository<LectApply, Long> {
 
     List<LectApply> findByApplyStatus(String applyStatus);
 
+    // archiveMyProblemCountSubmit
+    long countByLectInfo_LectNoAndApplyStatus(int lectInfoLectNo, String applyStatus);
 }

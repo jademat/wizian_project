@@ -28,7 +28,7 @@ public class JwtTokenProvider {
         secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 토큰을 생성하는 메소드 (관리자와 학생 공통)
+    // 토큰을 생성하는 메소드 (관리자, 학생, 강사 공통)
     public String generateToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + validity);

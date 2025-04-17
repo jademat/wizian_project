@@ -30,6 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Qualifier("customUserDetailsService")  // 학생용 UserDetailsService 빈을 주입
     private final UserDetailsService userDetailsServiceForStudent;
 
+    @Qualifier("customInstDetailsService")  // 강사용 UserDetailsService 빈을 주입
+    private final UserDetailsService userDetailsServiceForInst;
+
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain fc) throws ServletException, IOException {
         String jwt = null;
@@ -76,9 +79,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 관리자와 학생을 구분하여 적절한 UserDetailsService를 사용
             if (isAdmin(req)) {
                 userDetails = userDetailsServiceForAdmin.loadUserByUsername(username);
+            } else if (isInstructor(req)) {
+                userDetails = userDetailsServiceForInst.loadUserByUsername(username);
             } else {
                 userDetails = userDetailsServiceForStudent.loadUserByUsername(username);
             }
+
 
             if (userDetails != null && jwtTokenProvider.validateToken(jwt)) {
                 UsernamePasswordAuthenticationToken auth =
@@ -99,5 +105,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 요청이 관리자인지 학생인지를 판단하는 메소드
     private boolean isAdmin(HttpServletRequest req) {
         return req.getRequestURI().startsWith("/admin"); // /admin으로 시작하는 요청을 관리자로 판단
+    }
+
+    // 요청이 강사인지 판단하는 메소드
+    private boolean isInstructor(HttpServletRequest req) {
+        return req.getRequestURI().startsWith("/teacher"); // /teacher으로 시작하는 요청을 관리자로 판단
     }
 }

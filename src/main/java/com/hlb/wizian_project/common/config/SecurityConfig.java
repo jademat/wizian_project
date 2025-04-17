@@ -37,6 +37,8 @@ public class SecurityConfig {
                 .antMatchers("/api/admins/admin/login").permitAll()
                 // 학생 관련 API는 누구나 접근 가능
                 .antMatchers("/api/auth/**", "/api/auth/stdnt/**", "/api/auth/stdnt/forgot-password", "/api/auth/stdnt/verifyCode", "/api/auth/stdnt/reset-password").permitAll()
+                // 강사 관련 API는 누구나 접근 가능
+                .antMatchers("/api/auth/**", "/api/auth/inst/**").permitAll()
                 // 대시보드는 인증된 사용자만 접근 가능
                 .antMatchers("/api/dashboard").authenticated()
                 // 관리자와 관련된 API는 인증된 사용자만 접근
