@@ -74,4 +74,7 @@ public class Studnt {
 
     @Column
     private LocalDateTime tokenExpiry;
+
+    @Column(length = 20)
+    private String loginType = "LOCAL";
 }

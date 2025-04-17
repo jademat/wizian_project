@@ -67,16 +67,20 @@ public class AuthController {
         log.info("submit된 로그인 정보 : {}", studnt);
 
         try {
+            Studnt loginUser = studntService.loginStudent(studnt.getStdntId(), studnt.getPwd());
+
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(studnt.getStdntId(), studnt.getPwd())
             );
 
             final String jwt = jwtTokenProvider.generateToken(studnt.getStdntId());
 
-            Map<String, String> tokens = Map.of(
-                    "accessToken", jwt
-            );
+            Map<String, String> tokens = Map.of("accessToken", jwt);
             response = ResponseEntity.ok().body(tokens);
+
+        } catch (IllegalStateException e) {
+            response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("이메일 인증을 하지 않았습니다!!");
         } catch (UsernameNotFoundException e) {
             response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("아이디가 존재하지 않습니다!!");
@@ -85,10 +89,12 @@ public class AuthController {
                     .body("아이디나 비밀번호가 일치하지 않습니다!!");
         } catch (Exception e) {
             response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("이메일 인증을 하지 않았습니다!!");
+                    .body("알 수 없는 오류 발생!!");
+            e.printStackTrace();
         }
 
         return response;
     }
+
 
 }

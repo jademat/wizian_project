@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LectInfoRepository extends JpaRepository<LectInfo, Long> {
 
@@ -25,4 +26,7 @@ public interface LectInfoRepository extends JpaRepository<LectInfo, Long> {
     // findStudentAttendInfo
     @Query("select l.courses.fullTime from LectInfo l where l.lectNo = :lectNo")
     int findFullTimeByLectNo(int lectNo);
+
+    Optional<LectInfo> findByLectNo(int lectNo);
+
 }

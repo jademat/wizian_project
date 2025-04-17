@@ -39,9 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = null;
 
         final String authHeader = req.getHeader("Authorization");
+        log.info(">> Authorization 헤더: {}", authHeader);
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7); // "Bearer " 이후의 토큰
         }
+        log.info(">> Extracted JWT from Header: {}", jwt);
 
         if (jwt == null) {
             Cookie[] cookies = req.getCookies();
@@ -54,13 +56,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }
+        log.info(">> 최종 JWT: {}", jwt);
 
         if (jwt == null) {
+            log.warn(">> JWT가 요청에서 제공되지 않음");
             fc.doFilter(req, res);  // 필터 체인 계속 진행
             return;
         }
 
-        username = jwtTokenProvider.extractUsername(jwt);
+        try {
+            username = jwtTokenProvider.extractUsername(jwt);
+            log.info(">> JWT에서 추출한 username: {}", username); // username 로그 찍기
+        } catch (Exception e) {
+            log.error(">> JWT 파싱 실패: {}", e.getMessage()); // 예외 로그 출력
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "잘못된 JWT 형식입니다.");
+            return;
+        }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             log.info(">> JwtAuthenticationFilter - loadUserByUsername 호출 ");
             UserDetails userDetails = null;
@@ -80,7 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                log.info("Authentication set for user: {}", username);
+                log.info(">> 인증 성공: {}", username);
             } else {
                 log.warn("유효하지 않은 토큰입니다.");
                 res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰입니다.");
